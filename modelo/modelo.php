@@ -3,15 +3,15 @@ class modelo {
 	
 	private $host = "localhost";
 	private $user = "root";
-	private $pw = "1234";
-	private $db = "WiediiTienda";
+	private $pw = "root";
+    private $db = "WiediiTienda";
 	private $conexion;
 
 	public function __construct(){
 	}
 	
 	public function conectar(){
-		$this->conexion = mysqli_connect($this->host, $this->user , $this->pw, $this->db) or die("Problemas al conectar al servidor.");
+        $this->conexion = mysqli_connect($this->$host, $this->$user, $this->$pw, $this->$db) or die("Problemas al conectar al servidor.");
 	}
 	
 	public function desconectar(){
