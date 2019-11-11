@@ -44,7 +44,7 @@ class Container extends PimpleContainer implements ContainerInterface
         'responseChunkSize' => 4096,
         'outputBuffering' => 'append',
         'determineRouteBeforeAppMiddleware' => false,
-        'displayErrorDetails' => false,
+        'displayErrorDetails' => true,
         'addContentLengthHeader' => true,
         'routerCacheFile' => false,
     ];
