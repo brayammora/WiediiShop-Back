@@ -5,10 +5,11 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 require '../vendor/autoload.php';
 require '../src/config/db.php';
+require '../src/config/respuesta.php';
 
 $app = new \Slim\App;
 
-//Ruta login
+//Ruta login/logout
 require '../src/routes/autenticacion.php';
 
 //Ruta clientes

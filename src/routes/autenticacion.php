@@ -4,34 +4,40 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 //GET login
-$app->get('/login', function (Request $request, Response $response) {
+$app->post('/login', function (Request $request, Response $response) {
 
-    $huella =  $request->getAttribute('huella');
+    $respuesta = new Respuesta();
+    $huella =  $request->getParam('huella');
 
-    if (isset($huella)) {
-        $sql = "SELECT * FROM usuario where huellaDactilar = $huella";
+    if (isset($huella) && !empty($huella)) {
+        $sql = "SELECT idUsuario, nombre, cedula FROM usuario where huellaDactilar = '$huella'";
         try {
             $db = new db();
             $db = $db->conectar();
-            $resultado = $db->query($sql);
-            if ($resultado->rowCount() > 0) {
-                $usuario = $resultado->fetchAll(PDO::FETCH_OBJ);
-                $_SESSION["usuario"] = json_encode($usuario);
-                echo json_encode($usuario); //acceso autorizado
+            $consulta = $db->query($sql);
+            if ($consulta->rowCount() > 0) {
+                //acceso autorizado
+                $respuesta->setResponse(true);
+                $respuesta->result = $consulta->fetchAll(PDO::FETCH_OBJ);
             } else {
-                echo json_encode("No existen ningún usuario con esa huella.");
+                $respuesta->message = "No existe ningún usuario con esa huella.";
             }
-            $resultado = null;
+            //cierro conexiones
+            $consulta = null;
             $db = null;
         } catch (PDOException $e) {
-            echo '{"error" : "text": ' . $e->getMessage() . '}';
+            $respuesta->message =  $e->getMessage();
         }
     } else {
-        echo json_encode("Huella vacia: Acceso no autorizado.");
+        $respuesta->message = "Huella vacia: Acceso no autorizado.";
     }
+
+    return json_encode($respuesta);
 });
 
 $app->get('/logout', function (Request $request, Response $response) {
     session_destroy();
-    return $response->withJson(array("ok" => "Sesion finalizada."));
+    $respuesta = new Respuesta();
+    $respuesta->message = "Sesion finalizada.";
+    return json_encode($respuesta);
 });
