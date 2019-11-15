@@ -1,9 +1,9 @@
 <?php
 
-class Respuesta {
+class Response {
 	public $result     = null;
 	public $response   = false;
-	public $message    = 'Ocurrio un error inesperado.';
+	public $message    = 'An unexpected error occurred.';
 	public $href       = null;
 	public $function   = null;
 	public $filter     = null;
@@ -11,7 +11,7 @@ class Respuesta {
 	public function SetResponse($response, $m = '') {
 		$this->response = $response;
 		$this->message = $m;
-		if(!$response && $m = '') $this->response = 'Ocurrio un error inesperado';
+		if(!$response && $m = '') $this->response = 'An unexpected error occurred.';
 	}
 }
 ?>

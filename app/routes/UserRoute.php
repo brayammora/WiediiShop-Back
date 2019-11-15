@@ -11,7 +11,7 @@ $app->group('/user/', function () {
   });
 
   $this->get('getAll', function (Request $request, Response $response) {
-    $obj = new UsuarioModel();
+    $obj = new UserModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -24,7 +24,7 @@ $app->group('/user/', function () {
   });
 
   $this->get('get/{id}', function (Request $request, Response $response) {
-    $obj = new UsuarioModel();
+    $obj = new UserModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -39,7 +39,7 @@ $app->group('/user/', function () {
   });
 
   $this->post('save', function (Request $request, Response $response) {
-    $obj = new UsuarioModel();
+    $obj = new UserModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -54,7 +54,7 @@ $app->group('/user/', function () {
   });
 
   $this->delete('delete/{id}', function (Request $request, Response $response) {
-    $obj = new UsuarioModel();
+    $obj = new UserModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -69,7 +69,7 @@ $app->group('/user/', function () {
   });
 
   $this->post('login', function (Request $request, Response $response) {
-    $obj = new UsuarioModel();
+    $obj = new UserModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -84,7 +84,7 @@ $app->group('/user/', function () {
   });
 
   $this->post('logout', function (Request $request, Response $response) {
-    $obj = new UsuarioModel();
+    $obj = new UserModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')

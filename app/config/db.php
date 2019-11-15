@@ -3,7 +3,7 @@
 class db {
     
   private $dbHost = 'localhost';
-  private $dbName = 'WiediiTienda';
+  private $dbName = 'WiediiShop';
 	private $dbUser = 'root';
 	private $dbPassword = 'root';
 

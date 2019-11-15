@@ -4,7 +4,7 @@ require '../vendor/autoload.php';
 
 $app = new \Slim\App;
 
-//Cargar aplicacion
+//Load application
 require '../app/app_loader.php';
 
 $app->run();
