@@ -1,9 +1,9 @@
 <?php
 
-class UserModel
+class ProductModel
 {
   private $db;
-  private $table = 'user';
+  private $table = 'product';
   private $response;
 
   public function __CONSTRUCT()
@@ -23,7 +23,7 @@ class UserModel
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "There is no user created in the system.";
+        $this->response->message = "There is no product created in the system.";
       }
 
       //closing connections
@@ -41,14 +41,14 @@ class UserModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db->prepare("SELECT * FROM $this->table WHERE idUser = ?");
+      $query = $this->db->prepare("SELECT * FROM $this->table WHERE idProduct = ?");
       $query->execute(array($id));
 
       if ($query->rowCount() > 0) {
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "User not found.";
+        $this->response->message = "Product not found.";
       }
 
       //closing connections
@@ -67,46 +67,36 @@ class UserModel
     try {
       $this->db = $this->db->start();
 
-      if (isset($data['idUser'])) {
+      if (isset($data['idProduct'])) {
         $sql = "UPDATE $this->table SET 
-        name          = ?, 
-        document          = ?, 
-        mail          = ?, 
-        fingerprint  = ?,
-        rol             = ?,
-        password      = ?
-        WHERE idUser = ?";
+        name            = ?, 
+        price           = ?, 
+        barcode         = ?
+        WHERE idProduct = ?";
 
         $query = $this->db->prepare($sql);
         $query->execute(
           array(
             $data['name'],
-            $data['document'],
-            $data['mail'],
-            $data['fingerprint'],
-            $data['rol'],
-            $data['password'],
-            $data['idUser']
+            $data['price'],
+            $data['barcode']
           )
         );
-        $this->response->setResponse(true, "User successfully modified.");
+        $this->response->setResponse(true, "Product successfully modified.");
       } else {
         $sql = "INSERT INTO $this->table 
-        (name, document, mail, fingerprint, rol, password) 
-        VALUES (?, ?, ?, ?, ?, ?)";
+        (name, price, barcode) 
+        VALUES (?, ?, ?)";
 
         $this->db->prepare($sql)
           ->execute(
             array(
               $data['name'],
-              $data['document'],
-              $data['mail'],
-              $data['fingerprint'],
-              $data['rol'],
-              $data['password']
+              $data['price'],
+              $data['barcode']
             )
           );
-        $this->response->setResponse(true, "New user created.");
+        $this->response->setResponse(true, "New product created.");
       }
 
       //closing connections
@@ -124,11 +114,11 @@ class UserModel
     try {
       $this->db = $this->db->start();
       $query = $this->db
-        ->prepare("DELETE FROM $this->table WHERE idUser = ?");
+        ->prepare("DELETE FROM $this->table WHERE idProduct = ?");
 
       $query->execute(array($id));
       $this->response->setResponse(true);
-      $this->response->message = "User successfully removed.";
+      $this->response->message = "Product successfully removed.";
       //closing connections
       $query = null;
       $this->db = null;
@@ -139,40 +129,24 @@ class UserModel
     }
   }
 
-  public function Login($data)
+  public function GetByBarcode($id)
   {
     try {
-      $finger = $data['finger'];
-      if (!empty($finger)) {
-        $this->db = $this->db->start();
-        $query = $this->db->prepare("SELECT idUser, name, document, mail FROM user where fingerprint = ?");
-        $query->execute(array($finger));
+      $this->db = $this->db->start();
+      $query = $this->db->prepare("SELECT * FROM $this->table WHERE barcode = ?");
+      $query->execute(array($id));
 
-        if ($query->rowCount() > 0) {
-          $this->response->setResponse(true);
-          $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
-        } else {
-          $this->response->setResponse(false, "Fingerprint not identified in the system.");
-        }
-
-        //closing connections
-        $query = null;
-        $this->db = null;
+      if ($query->rowCount() > 0) {
+        $this->response->setResponse(true);
+        $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->setResponse(false, "Empty field! Try again.");
+        $this->response->message = "Product not found.";
       }
 
-      return $this->response;
-    } catch (Exception $e) {
-      $this->response->setResponse(false, $e->getMessage());
-      return $this->response;
-    }
-  }
+      //closing connections
+      $query = null;
+      $this->db = null;
 
-  public function Logout()
-  {
-    try {
-      $this->response->setResponse(true, "Session finished.");
       return $this->response;
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
