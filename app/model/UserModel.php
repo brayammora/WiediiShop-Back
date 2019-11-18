@@ -9,7 +9,7 @@ class UserModel
   public function __CONSTRUCT()
   {
     $this->db = new db();
-    $this->response = new response();
+    $this->response = new Response();
   }
 
   public function GetAll()

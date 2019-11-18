@@ -9,7 +9,7 @@ class ProductModel
   public function __CONSTRUCT()
   {
     $this->db = new db();
-    $this->response = new response();
+    $this->response = new Response();
   }
 
   public function GetAll()
@@ -132,20 +132,24 @@ class ProductModel
   public function GetByBarcode($id)
   {
     try {
-      $this->db = $this->db->start();
-      $query = $this->db->prepare("SELECT * FROM $this->table WHERE barcode = ?");
-      $query->execute(array($id));
+      if (isset($id) && !empty($id)) {
+        $this->db = $this->db->start();
+        $query = $this->db->prepare("SELECT * FROM $this->table WHERE barcode = ?");
+        $query->execute(array(trim($id)));
 
-      if ($query->rowCount() > 0) {
-        $this->response->setResponse(true);
-        $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
+        if ($query->rowCount() > 0) {
+          $this->response->setResponse(true);
+          $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
+        } else {
+          $this->response->message = "Product not found.";
+        }
+
+        //closing connections
+        $query = null;
+        $this->db = null;
       } else {
-        $this->response->message = "Product not found.";
+        $this->response->setResponse(false, "Incorrect barcode.");
       }
-
-      //closing connections
-      $query = null;
-      $this->db = null;
 
       return $this->response;
     } catch (Exception $e) {

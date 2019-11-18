@@ -83,4 +83,19 @@ $app->group('/purchase/', function () {
       );
   });
 
+  $this->post('sendMail', function (Request $request, Response $response) {
+    $obj = new PurchaseModel();
+
+    return $response
+      ->withHeader('Content-type', 'application/json')
+      ->getBody()
+      ->write(
+        json_encode(
+          $obj->sendMail(
+            $request->getParsedBody()
+          )
+        )
+      );
+  });
+
 });
