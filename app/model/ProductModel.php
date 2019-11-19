@@ -134,21 +134,37 @@ class ProductModel
     try {
       if (isset($id) && !empty($id)) {
         $this->db = $this->db->start();
-        $query = $this->db->prepare("SELECT * FROM $this->table WHERE barcode = ?");
+
+        //compruebo que el producto no haya sido vendido
+        $query = $this->db->prepare(
+          "SELECT prod.name as productName, user.name as userName, purc.datePurchase as datePurchase
+          FROM purchase purc
+          INNER JOIN user on (purc.idUser = user.idUser)
+          INNER JOIN product prod on (purc.idProduct = prod.idProduct) 
+          WHERE prod.barcode = ?"
+        );
         $query->execute(array(trim($id)));
 
         if ($query->rowCount() > 0) {
-          $this->response->setResponse(true);
-          $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
+          $this->response->message = "Producto ya vendido.";
         } else {
-          $this->response->message = "Product not found.";
+          unset($query);
+          $query = $this->db->prepare("SELECT * FROM $this->table WHERE barcode = ?");
+          $query->execute(array(trim($id)));
+
+          if ($query->rowCount() > 0) {
+            $this->response->setResponse(true);
+            $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
+          } else {
+            $this->response->message = "Producto no encontrado.";
+          }
         }
 
         //closing connections
         $query = null;
         $this->db = null;
       } else {
-        $this->response->setResponse(false, "Incorrect barcode.");
+        $this->response->setResponse(false, "Codigo de barras incorrecto.");
       }
 
       return $this->response;

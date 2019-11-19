@@ -68,21 +68,6 @@ $app->group('/purchase/', function () {
       );
   });
 
-  $this->get('getByBarcode/{id}', function (Request $request, Response $response) {
-    $obj = new PurchaseModel();
-
-    return $response
-      ->withHeader('Content-type', 'application/json')
-      ->getBody()
-      ->write(
-        json_encode(
-          $obj->GetByBarcode(
-            $request->getAttribute('id')
-          )
-        )
-      );
-  });
-
   $this->post('sendMail', function (Request $request, Response $response) {
     $obj = new PurchaseModel();
 
@@ -98,4 +83,18 @@ $app->group('/purchase/', function () {
       );
   });
 
+  $this->get('getByBarcodeReturn/{id}', function (Request $request, Response $response) {
+    $obj = new PurchaseModel();
+
+    return $response
+      ->withHeader('Content-type', 'application/json')
+      ->getBody()
+      ->write(
+        json_encode(
+          $obj->GetByBarcodeReturn(
+            $request->getAttribute('id')
+          )
+        )
+      );
+  });
 });

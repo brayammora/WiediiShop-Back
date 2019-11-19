@@ -25,7 +25,7 @@ class PurchaseModel
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "There is no purchase created in the system.";
+        $this->response->message = "No hay ninguna compra creada en el sistema.";
       }
 
       //closing connections
@@ -50,7 +50,7 @@ class PurchaseModel
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "Purchase not found.";
+        $this->response->message = "Compra no encontrada.";
       }
 
       //closing connections
@@ -68,11 +68,9 @@ class PurchaseModel
   {
     $user = $data['user'];
     $products = $data['products'];
-
     try {
       $this->db = $this->db->start();
       $query = null;
-
       if (isset($data['idPurchase'])) {
         $sql = "UPDATE $this->table SET 
         idProduct         = ?, 
@@ -81,7 +79,6 @@ class PurchaseModel
         datePayment       = ?,
         state             = ?
         WHERE idPurchase  = ?";
-
         $query = $this->db->prepare($sql);
         $query->execute(
           array(
@@ -94,12 +91,11 @@ class PurchaseModel
         );
         $this->response->setResponse(true, "Purchase successfully modified.");
       } else {
-
         foreach ($products as $product) {
+          
           $sql = "INSERT INTO $this->table 
           (idProduct, idUser, datePurchase, datePayment, state) 
           VALUES (?, ?, ?, ?, ?)";
-
           $query = $this->db->prepare($sql);
           $query->execute(
             array(
@@ -113,16 +109,15 @@ class PurchaseModel
           $this->response->setResponse(true, "Purchase successfully created. Check your mail.");
         }
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
     }
   }
+
 
   public function Delete($id)
   {
@@ -133,7 +128,7 @@ class PurchaseModel
 
       $query->execute(array($id));
       $this->response->setResponse(true);
-      $this->response->message = "Purchase successfully removed.";
+      $this->response->message = "Compra eliminada exitosamente.";
       //closing connections
       $query = null;
       $this->db = null;
@@ -164,6 +159,41 @@ class PurchaseModel
       return $this->response;
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
+    }
+  }
+
+  public function GetByBarcodeReturn($id)
+  {
+    try {
+      if (isset($id) && !empty($id)) {
+        $this->db = $this->db->start();
+        $query = $this->db->prepare(
+          "SELECT prod.name as productName, user.name as userName, purc.datePurchase as datePurchase
+          FROM purchase purc
+          INNER JOIN user on (purc.idUser = user.idUser)
+          INNER JOIN product prod on (purc.idProduct = prod.idProduct) 
+          WHERE prod.barcode = ?"
+        );
+        $query->execute(array(trim($id)));
+
+        if ($query->rowCount() > 0) {
+          $this->response->setResponse(true);
+          $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
+        } else {
+          $this->response->message = "Product not found.";
+        }
+
+        //closing connections
+        $query = null;
+        $this->db = null;
+      } else {
+        $this->response->setResponse(false, "Incorrect barcode.");
+      }
+
+      return $this->response;
+    } catch (Exception $e) {
+      $this->response->setResponse(false, $e->getMessage());
+      return $this->response;
     }
   }
 }
