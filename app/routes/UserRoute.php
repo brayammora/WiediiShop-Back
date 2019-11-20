@@ -7,7 +7,7 @@ $app->group('/user/', function () {
 
   $this->get('test', function (Request $request, Response $response) {
     return $response->getBody()
-      ->write('Hello Users');
+      ->write(date('Y-m-d H:i:s'));
   });
 
   $this->get('getAll', function (Request $request, Response $response) {

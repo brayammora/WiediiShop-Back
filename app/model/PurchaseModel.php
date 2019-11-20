@@ -106,7 +106,7 @@ class PurchaseModel
               'UNPAID'
             )
           );
-          $this->response->setResponse(true, "Purchase successfully created. Check your mail.");
+          $this->response->setResponse(true, "¡Compra realizada exitosamente! Revisa tu correo.");
         }
       }
       //closing connections
@@ -168,7 +168,7 @@ class PurchaseModel
       if (isset($id) && !empty($id)) {
         $this->db = $this->db->start();
         $query = $this->db->prepare(
-          "SELECT prod.name as productName, user.name as userName, purc.datePurchase as datePurchase
+          "SELECT prod.name as datePurchase
           FROM purchase purc
           INNER JOIN user on (purc.idUser = user.idUser)
           INNER JOIN product prod on (purc.idProduct = prod.idProduct) 
