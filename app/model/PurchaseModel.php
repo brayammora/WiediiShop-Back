@@ -18,7 +18,10 @@ class PurchaseModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db->prepare("SELECT * FROM $this->table");
+      $query = $this->db->prepare(
+        " SELECT  idPurchase, idProduct, idUser, datePurchase, datePayment, state
+            FROM  $this->table "
+      );
       $query->execute();
 
       if ($query->rowCount() > 0) {
@@ -27,12 +30,11 @@ class PurchaseModel
       } else {
         $this->response->message = "No hay ninguna compra creada en el sistema.";
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -43,7 +45,11 @@ class PurchaseModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db->prepare("SELECT * FROM $this->table WHERE idPurchase = ?");
+      $query = $this->db->prepare( 
+        " SELECT  idPurchase, idProduct, idUser, datePurchase, datePayment, state 
+            FROM  $this->table 
+           WHERE  idPurchase = ? "
+      );
       $query->execute(array($id));
 
       if ($query->rowCount() > 0) {
@@ -52,12 +58,11 @@ class PurchaseModel
       } else {
         $this->response->message = "Compra no encontrada.";
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -72,14 +77,15 @@ class PurchaseModel
       $this->db = $this->db->start();
       $query = null;
       if (isset($data['idPurchase'])) {
-        $sql = "UPDATE $this->table SET 
-        idProduct         = ?, 
-        idUser            = ?, 
-        datePurchase      = ?,
-        datePayment       = ?,
-        state             = ?
-        WHERE idPurchase  = ?";
-        $query = $this->db->prepare($sql);
+        $query = $this->db->prepare(
+          " UPDATE  $this->table 
+               SET  idProduct = ?, 
+                    idUser = ?, 
+                    datePurchase = ?,
+                    datePayment = ?,
+                    state = ?
+             WHERE  idPurchase = ? "
+        );
         $query->execute(
           array(
             $data['idProduct'],
@@ -92,11 +98,12 @@ class PurchaseModel
         $this->response->setResponse(true, "Purchase successfully modified.");
       } else {
         foreach ($products as $product) {
-          
-          $sql = "INSERT INTO $this->table 
-          (idProduct, idUser, datePurchase, datePayment, state) 
-          VALUES (?, ?, ?, ?, ?)";
-          $query = $this->db->prepare($sql);
+          $query = $this->db->prepare(
+            " INSERT 
+                INTO  $this->table 
+                      (idProduct, idUser, datePurchase, datePayment, state) 
+              VALUES  (?, ?, ?, ?, ?) "
+          );
           $query->execute(
             array(
               $product['idProduct'],
@@ -106,34 +113,36 @@ class PurchaseModel
               'UNPAID'
             )
           );
-          $this->response->setResponse(true, "¡Compra realizada exitosamente! Revisa tu correo.");
         }
+        $this->response->setResponse(true, "¡Compra realizada exitosamente! Revisa tu correo.");
       }
       //closing connections
       $query = null;
       $this->db = null;
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
     }
   }
 
-
   public function Delete($id)
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db
-        ->prepare("DELETE FROM $this->table WHERE idPurchase = ?");
-
+      $query = $this->db->prepare(
+        " DELETE 
+            FROM  $this->table 
+           WHERE  idPurchase = ? "
+      );
       $query->execute(array($id));
       $this->response->setResponse(true);
       $this->response->message = "Compra eliminada exitosamente.";
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
     }
@@ -143,20 +152,23 @@ class PurchaseModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db
-        ->prepare("SELECT * FROM $this->table WHERE idUser = ? and state = 'UNPAID' order by datePurchase desc");
-
+      $query = $this->db->prepare(
+        " SELECT  * 
+            FROM  $this->table 
+           WHERE  idUser = ? 
+             AND  state = 'UNPAID' 
+        ORDER BY  datePurchase desc "
+      );
       $query->execute(array($data['idUser']));
       $debts = $query->fetchAll(PDO::FETCH_OBJ);
       $mail = $this->sender->SendMail($data['mail'], $debts);
-
       $this->response->setResponse(true);
       $this->response->message = $mail;
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
     }

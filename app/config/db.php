@@ -2,10 +2,15 @@
 
 class db {
     
+  // private $dbHost = 'localhost';
+  // private $dbName = 'WiediiShop';
+	// private $dbUser = 'root';
+  // private $dbPassword = 'root';
+  
   private $dbHost = 'localhost';
-  private $dbName = 'WiediiShop';
+  private $dbName = 'wiediishop';
 	private $dbUser = 'root';
-	private $dbPassword = 'root';
+	private $dbPassword = '';
 
     public function start() {
         $mysqlConnect = "mysql:host=$this->dbHost;dbname=$this->dbName";

@@ -16,21 +16,23 @@ class UserModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db->prepare("SELECT * FROM $this->table");
+      $query = $this->db->prepare(
+        " SELECT  idUser, name, document, mail, fingerprint, rol, password 
+           FROM   $this->table "
+      );
       $query->execute();
 
       if ($query->rowCount() > 0) {
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "There is no user created in the system.";
+        $this->response->message = "No hay ningún usuario agregado al sistema.";
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -41,21 +43,24 @@ class UserModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db->prepare("SELECT * FROM $this->table WHERE idUser = ?");
+      $query = $this->db->prepare(
+        " SELECT  idUser, name, document, mail, fingerprint, rol, password 
+            FROM  $this->table 
+           WHERE  idUser = ? "
+      );
       $query->execute(array($id));
 
       if ($query->rowCount() > 0) {
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "User not found.";
+        $this->response->message = "Usuario no encontrado.";
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -68,16 +73,16 @@ class UserModel
       $this->db = $this->db->start();
 
       if (isset($data['idUser'])) {
-        $sql = "UPDATE $this->table SET 
-        name          = ?, 
-        document          = ?, 
-        mail          = ?, 
-        fingerprint  = ?,
-        rol             = ?,
-        password      = ?
-        WHERE idUser = ?";
-
-        $query = $this->db->prepare($sql);
+        $query = $this->db->prepare(
+          " UPDATE  $this->table 
+               SET  name = ?, 
+                    document = ?, 
+                    mail = ?, 
+                    fingerprint = ?,
+                    rol = ?,
+                    password = ?
+             WHERE  idUser = ? "
+        );
         $query->execute(
           array(
             $data['name'],
@@ -89,14 +94,15 @@ class UserModel
             $data['idUser']
           )
         );
-        $this->response->setResponse(true, "User successfully modified.");
+        $this->response->setResponse(true, "Usuario modificado exitosamente.");
       } else {
-        $sql = "INSERT INTO $this->table 
-        (name, document, mail, fingerprint, rol, password) 
-        VALUES (?, ?, ?, ?, ?, ?)";
-
-        $this->db->prepare($sql)
-          ->execute(
+        $query = $this->db->prepare(
+          " INSERT 
+              INTO  $this->table 
+                    (name, document, mail, fingerprint, rol, password) 
+            VALUES  (?, ?, ?, ?, ?, ?) "
+        );
+        $query->execute(
             array(
               $data['name'],
               $data['document'],
@@ -106,14 +112,13 @@ class UserModel
               $data['password']
             )
           );
-        $this->response->setResponse(true, "New user created.");
+        $this->response->setResponse(true, "Nuevo usuario creado.");
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
     }
@@ -123,17 +128,19 @@ class UserModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db
-        ->prepare("DELETE FROM $this->table WHERE idUser = ?");
-
+      $query = $this->db->prepare(
+        " DELETE 
+            FROM  $this->table 
+           WHERE  idUser = ? "
+      );
       $query->execute(array($id));
       $this->response->setResponse(true);
-      $this->response->message = "User successfully removed.";
+      $this->response->message = "Usuario eliminado exitosamente.";
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
     }
@@ -145,24 +152,27 @@ class UserModel
       $finger = $data['finger'];
       if (!empty($finger)) {
         $this->db = $this->db->start();
-        $query = $this->db->prepare("SELECT idUser, name, document, mail FROM user where fingerprint = ?");
+        $query = $this->db->prepare(
+          " SELECT  idUser, name, document, mail 
+              FROM  user 
+             WHERE  fingerprint = ? "
+        );
         $query->execute(array($finger));
 
         if ($query->rowCount() > 0) {
           $this->response->setResponse(true);
           $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
         } else {
-          $this->response->setResponse(false, "Fingerprint not identified in the system.");
+          $this->response->setResponse(false, "Huella no identificada en el sistema.");
         }
-
         //closing connections
         $query = null;
         $this->db = null;
       } else {
-        $this->response->setResponse(false, "Empty field! Try again.");
+        $this->response->setResponse(false, "¡Campo vacio! Intente de nuevo.");
       }
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -172,8 +182,9 @@ class UserModel
   public function Logout()
   {
     try {
-      $this->response->setResponse(true, "Session finished.");
+      $this->response->setResponse(true, "Sesión finalizada.");
       return $this->response;
+      
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;

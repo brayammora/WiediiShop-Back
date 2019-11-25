@@ -16,21 +16,23 @@ class ProductModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db->prepare("SELECT * FROM $this->table");
+      $query = $this->db->prepare(
+        " SELECT  idProduct, name, price, barcode 
+            FROM  $this->table "
+      );
       $query->execute();
 
       if ($query->rowCount() > 0) {
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "There is no product created in the system.";
+        $this->response->message = "No hay ningún producto agregado al sistema.";
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -41,21 +43,24 @@ class ProductModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db->prepare("SELECT * FROM $this->table WHERE idProduct = ?");
+      $query = $this->db->prepare(
+        " SELECT  idProduct, name, price, barcode 
+            FROM  $this->table 
+           WHERE  idProduct = ? "
+      );
       $query->execute(array($id));
 
       if ($query->rowCount() > 0) {
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "Product not found.";
+        $this->response->message = "Producto no encontrado.";
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -68,13 +73,13 @@ class ProductModel
       $this->db = $this->db->start();
 
       if (isset($data['idProduct'])) {
-        $sql = "UPDATE $this->table SET 
-        name            = ?, 
-        price           = ?, 
-        barcode         = ?
-        WHERE idProduct = ?";
-
-        $query = $this->db->prepare($sql);
+        $query = $this->db->prepare(
+          " UPDATE  $this->table 
+               SET  name = ?, 
+                    price = ?, 
+                    barcode = ?
+             WHERE  idProduct = ? "
+        );
         $query->execute(
           array(
             $data['name'],
@@ -82,28 +87,28 @@ class ProductModel
             $data['barcode']
           )
         );
-        $this->response->setResponse(true, "Product successfully modified.");
+        $this->response->setResponse(true, "Producto modificado exitosamente.");
       } else {
-        $sql = "INSERT INTO $this->table 
-        (name, price, barcode) 
-        VALUES (?, ?, ?)";
-
-        $this->db->prepare($sql)
-          ->execute(
-            array(
-              $data['name'],
-              $data['price'],
-              $data['barcode']
-            )
-          );
-        $this->response->setResponse(true, "New product created.");
+        $query = $this->db->prepare(
+          " INSERT  
+              INTO  $this->table 
+                    (name, price, barcode) 
+            VALUES  (?, ?, ?) "
+        );
+        $query->execute(
+          array(
+            $data['name'],
+            $data['price'],
+            $data['barcode']
+          )
+        );
+        $this->response->setResponse(true, "Nuevo producto agregado.");
       }
-
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
     }
@@ -113,17 +118,19 @@ class ProductModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db
-        ->prepare("DELETE FROM $this->table WHERE idProduct = ?");
-
+      $query = $this->db->prepare(
+        " DELETE 
+            FROM  $this->table 
+           WHERE  idProduct = ? "
+      );
       $query->execute(array($id));
       $this->response->setResponse(true);
-      $this->response->message = "Product successfully removed.";
+      $this->response->message = "Producto eliminado exitosamente.";
       //closing connections
       $query = null;
       $this->db = null;
-
       return $this->response;
+
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
     }
@@ -134,8 +141,11 @@ class ProductModel
     try {
       if (isset($id) && !empty($id)) {
         $this->db = $this->db->start();
-
-        $query = $this->db->prepare("SELECT * FROM $this->table WHERE barcode = ?");
+        $query = $this->db->prepare(
+          " SELECT  idProduct, name, price, barcode
+              FROM  $this->table 
+             WHERE  barcode = ? "
+        );
         $query->execute(array(trim($id)));
 
         if ($query->rowCount() > 0) {
@@ -144,15 +154,14 @@ class ProductModel
         } else {
           $this->response->message = "Producto no encontrado.";
         }
-
         //closing connections
         $query = null;
         $this->db = null;
       } else {
         $this->response->setResponse(false, "Codigo de barras incorrecto.");
       }
-
       return $this->response;
+      
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
