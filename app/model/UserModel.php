@@ -121,6 +121,7 @@ class UserModel
 
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
+      return $this->response;
     }
   }
 
@@ -143,6 +144,7 @@ class UserModel
 
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
+      return $this->response;
     }
   }
 

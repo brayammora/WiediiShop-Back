@@ -3,15 +3,15 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-$app->group('/purchase/', function () {
+$app->group('/return/', function () {
 
   $this->get('test', function (Request $request, Response $response) {
     return $response->getBody()
-      ->write('Hello purchases');
+      ->write('Hello returns');
   });
 
   $this->get('getAll', function (Request $request, Response $response) {
-    $obj = new PurchaseModel();
+    $obj = new ReturnModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -24,7 +24,7 @@ $app->group('/purchase/', function () {
   });
 
   $this->get('get/{id}', function (Request $request, Response $response) {
-    $obj = new PurchaseModel();
+    $obj = new ReturnModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -39,7 +39,7 @@ $app->group('/purchase/', function () {
   });
 
   $this->post('save', function (Request $request, Response $response) {
-    $obj = new PurchaseModel();
+    $obj = new ReturnModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -54,7 +54,7 @@ $app->group('/purchase/', function () {
   });
 
   $this->delete('delete/{id}', function (Request $request, Response $response) {
-    $obj = new PurchaseModel();
+    $obj = new ReturnModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
@@ -67,35 +67,4 @@ $app->group('/purchase/', function () {
         )
       );
   });
-
-  $this->post('sendMail', function (Request $request, Response $response) {
-    $obj = new PurchaseModel();
-
-    return $response
-      ->withHeader('Content-type', 'application/json')
-      ->getBody()
-      ->write(
-        json_encode(
-          $obj->sendMail(
-            $request->getParsedBody()
-          )
-        )
-      );
-  });
-
-  $this->get('validateReturn/{id}', function (Request $request, Response $response) {
-    $obj = new PurchaseModel();
-
-    return $response
-      ->withHeader('Content-type', 'application/json')
-      ->getBody()
-      ->write(
-        json_encode(
-          $obj->validateReturn(
-            $request->getAttribute('id')
-          )
-        )
-      );
-  });
-
 });

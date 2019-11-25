@@ -34,7 +34,6 @@ class PurchaseModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -45,7 +44,7 @@ class PurchaseModel
   {
     try {
       $this->db = $this->db->start();
-      $query = $this->db->prepare( 
+      $query = $this->db->prepare(
         " SELECT  idPurchase, idProduct, idUser, datePurchase, datePayment, state 
             FROM  $this->table 
            WHERE  idPurchase = ? "
@@ -62,7 +61,6 @@ class PurchaseModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -92,7 +90,8 @@ class PurchaseModel
             $data['idUser'],
             $data['datePurchase'],
             $data['datePayment'],
-            $data['state']
+            $data['state'],
+            $data['idPurchase']
           )
         );
         $this->response->setResponse(true, "Purchase successfully modified.");
@@ -110,7 +109,7 @@ class PurchaseModel
               $user,
               date('Y-m-d H:i:s'),
               null,
-              'UNPAID'
+              'SIN PAGAR'
             )
           );
         }
@@ -120,9 +119,9 @@ class PurchaseModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
+      return $this->response;
     }
   }
 
@@ -142,9 +141,9 @@ class PurchaseModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
+      return $this->response;
     }
   }
 
@@ -156,7 +155,7 @@ class PurchaseModel
         " SELECT  * 
             FROM  $this->table 
            WHERE  idUser = ? 
-             AND  state = 'UNPAID' 
+             AND  state = 'SIN PAGAR' 
         ORDER BY  datePurchase desc "
       );
       $query->execute(array($data['idUser']));
@@ -168,23 +167,26 @@ class PurchaseModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
+      return $this->response;
     }
   }
 
-  public function GetByBarcodeReturn($id)
+  public function validateReturn($id)
   {
     try {
       if (isset($id) && !empty($id)) {
         $this->db = $this->db->start();
         $query = $this->db->prepare(
-          "SELECT prod.name as datePurchase
-          FROM purchase purc
-          INNER JOIN user on (purc.idUser = user.idUser)
-          INNER JOIN product prod on (purc.idProduct = prod.idProduct) 
-          WHERE prod.barcode = ?"
+          " SELECT  purc.idPurchase, purc.datePurchase, prod.name, prod.price
+              FROM  purchase purc
+        INNER JOIN  user on (purc.idUser = user.idUser)
+        INNER JOIN  product prod on (purc.idProduct = prod.idProduct) 
+             WHERE  user.idUser = ?
+               AND  DATEDIFF(now(), purc.datePurchase)  <= 2
+               AND  state <> 'DEVUELTO'
+          ORDER BY  purc.datePurchase desc"
         );
         $query->execute(array(trim($id)));
 
@@ -192,14 +194,12 @@ class PurchaseModel
           $this->response->setResponse(true);
           $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
         } else {
-          $this->response->message = "Product not found.";
+          $this->response->message = "No hay productos para este usuario.";
         }
 
         //closing connections
         $query = null;
         $this->db = null;
-      } else {
-        $this->response->setResponse(false, "Incorrect barcode.");
       }
 
       return $this->response;

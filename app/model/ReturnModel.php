@@ -1,15 +1,17 @@
 <?php
 
-class ProductModel
+class ReturnModel
 {
   private $db;
-  private $table = 'product';
+  private $table = "returns";
   private $response;
+  private $sender;
 
   public function __CONSTRUCT()
   {
     $this->db = new db();
     $this->response = new Response();
+    $this->sender = new mail();
   }
 
   public function GetAll()
@@ -17,7 +19,7 @@ class ProductModel
     try {
       $this->db = $this->db->start();
       $query = $this->db->prepare(
-        " SELECT  idProduct, name, price, barcode 
+        " SELECT  idReturns, idPurchase, dateReturns, reason
             FROM  $this->table "
       );
       $query->execute();
@@ -26,13 +28,12 @@ class ProductModel
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "No hay ningún producto agregado al sistema.";
+        $this->response->message = "No hay ninguna devolución creada en el sistema.";
       }
       //closing connections
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -44,9 +45,9 @@ class ProductModel
     try {
       $this->db = $this->db->start();
       $query = $this->db->prepare(
-        " SELECT  idProduct, name, price, barcode 
+        " SELECT  idReturns, idPurchase, dateReturns, reason
             FROM  $this->table 
-           WHERE  idProduct = ? "
+           WHERE  idReturn = ? "
       );
       $query->execute(array($id));
 
@@ -54,13 +55,12 @@ class ProductModel
         $this->response->setResponse(true);
         $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
       } else {
-        $this->response->message = "Producto no encontrado.";
+        $this->response->message = "Devolución no encontrada.";
       }
       //closing connections
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -69,46 +69,46 @@ class ProductModel
 
   public function InsertOrUpdate($data)
   {
+    $idPurchase = $data['idPurchase'];
+    $reason = $data['reason'];
     try {
       $this->db = $this->db->start();
-
-      if (isset($data['idProduct'])) {
+      $query = null;
+      if (isset($data['idReturn'])) {
         $query = $this->db->prepare(
           " UPDATE  $this->table 
-               SET  name = ?, 
-                    price = ?, 
-                    barcode = ?
-             WHERE  idProduct = ? "
+               SET  idPurchase = ?, 
+                    dateReturns = ?, 
+                    reason = ?
+             WHERE  idReturns = ? "
         );
         $query->execute(
           array(
-            $data['name'],
-            $data['price'],
-            $data['barcode']
+            $data['idPurchase'],
+            $data['dateReturns'],
+            $data['reason'],
+            $data['idReturns'],
           )
         );
-        $this->response->setResponse(true, "Producto modificado exitosamente.");
+        $this->response->setResponse(true, "Purchase successfully modified.");
       } else {
         $query = $this->db->prepare(
-          " INSERT  
-              INTO  $this->table 
-                    (name, price, barcode) 
-            VALUES  (?, ?, ?) "
+          " INSERT INTO $this->table (idPurchase, dateReturns, reason) VALUES (?, ?, ?)"
         );
         $query->execute(
           array(
-            $data['name'],
-            $data['price'],
-            $data['barcode']
+            $idPurchase,
+            date('Y-m-d H:i:s'),
+            $reason
           )
         );
-        $this->response->setResponse(true, "Nuevo producto agregado.");
+
+        $this->response->setResponse(true, "¡Devolución realizada exitosamente! Revisa tu correo.");
       }
       //closing connections
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -122,48 +122,15 @@ class ProductModel
       $query = $this->db->prepare(
         " DELETE 
             FROM  $this->table 
-           WHERE  idProduct = ? "
+           WHERE  idReturn = ? "
       );
       $query->execute(array($id));
       $this->response->setResponse(true);
-      $this->response->message = "Producto eliminado exitosamente.";
+      $this->response->message = "Devolución eliminada exitosamente.";
       //closing connections
       $query = null;
       $this->db = null;
       return $this->response;
-
-    } catch (Exception $e) {
-      $this->response->setResponse(false, $e->getMessage());
-      return $this->response;
-    }
-  }
-
-  public function GetByBarcode($id)
-  {
-    try {
-      if (isset($id) && !empty($id)) {
-        $this->db = $this->db->start();
-        $query = $this->db->prepare(
-          " SELECT  idProduct, name, price, barcode
-              FROM  $this->table 
-             WHERE  barcode = ? "
-        );
-        $query->execute(array(trim($id)));
-
-        if ($query->rowCount() > 0) {
-          $this->response->setResponse(true);
-          $this->response->result = $query->fetchAll(PDO::FETCH_OBJ);
-        } else {
-          $this->response->message = "Producto no encontrado.";
-        }
-        //closing connections
-        $query = null;
-        $this->db = null;
-      } else {
-        $this->response->setResponse(false, "Codigo de barras incorrecto.");
-      }
-      return $this->response;
-      
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
