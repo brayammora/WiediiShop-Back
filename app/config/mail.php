@@ -10,7 +10,7 @@ class mail
   public function __CONSTRUCT()
   { }
 
-  public function SendMail($receiver, $data)
+  public function SendMail($receiver, $nombre, $data)
   {
       // Instantiation and passing `true` enables exceptions
       $mail = new PHPMailer(true);
@@ -31,8 +31,14 @@ class mail
 
         // Content
         $mail->isHTML(true);                                  // Set email format to HTML
+        $mail ->CharSet = " ISO-8859-1"; 
+        $mail->AddEmbeddedImage(__DIR__ . '/../../src/images/logo.svg', "image1", "logo.svg");
         $mail->Subject = 'Reporte de compras';
-        $mail->Body    = '<b>Reporte de compras</b>';
+        $cuerpo = file_get_contents(__DIR__ . '/../../src/mail.html');
+        $cuerpo = str_replace("{{body}}", $data, $cuerpo);
+        $cuerpo = str_replace("{{name}}", $nombre, $cuerpo);
+        $mail->Body    = utf8_decode($cuerpo);
+        
 
         $mail->send();
         return 'Message has been sent';

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Nov 15, 2019 at 09:28 PM
+-- Generation Time: Nov 26, 2019 at 02:59 PM
 -- Server version: 5.7.26
 -- PHP Version: 7.3.8
 
@@ -48,10 +48,52 @@ CREATE TABLE `purchase` (
   `idPurchase` int(11) NOT NULL,
   `idProduct` int(11) NOT NULL,
   `idUser` int(11) NOT NULL,
-  `datePurchase` date NOT NULL,
-  `datePayment` date NOT NULL,
+  `datePurchase` datetime NOT NULL,
+  `datePayment` datetime DEFAULT NULL,
   `state` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `purchase`
+--
+
+INSERT INTO `purchase` (`idPurchase`, `idProduct`, `idUser`, `datePurchase`, `datePayment`, `state`) VALUES
+(58, 1, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(59, 1, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(60, 1, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(61, 2, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(62, 3, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(63, 3, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(64, 4, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(65, 4, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(66, 5, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(67, 5, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(68, 5, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(69, 5, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
+(70, 5, 1, '2019-11-26 07:40:43', NULL, 'DEVUELTO'),
+(71, 1, 1, '2019-11-26 09:03:10', NULL, 'SIN PAGAR'),
+(72, 1, 1, '2019-11-26 09:04:24', NULL, 'SIN PAGAR'),
+(73, 1, 1, '2019-11-26 09:06:51', NULL, 'SIN PAGAR');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `returns`
+--
+
+CREATE TABLE `returns` (
+  `idReturns` int(11) NOT NULL,
+  `idPurchase` int(11) NOT NULL,
+  `dateReturns` date NOT NULL,
+  `reason` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `returns`
+--
+
+INSERT INTO `returns` (`idReturns`, `idPurchase`, `dateReturns`, `reason`) VALUES
+(39, 70, '2019-11-26', 'survey1');
 
 -- --------------------------------------------------------
 
@@ -101,6 +143,12 @@ ALTER TABLE `purchase`
   ADD KEY `fk_purchase_user` (`idUser`);
 
 --
+-- Indexes for table `returns`
+--
+ALTER TABLE `returns`
+  ADD PRIMARY KEY (`idReturns`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
@@ -122,7 +170,13 @@ ALTER TABLE `product`
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `idPurchase` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idPurchase` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+
+--
+-- AUTO_INCREMENT for table `returns`
+--
+ALTER TABLE `returns`
+  MODIFY `idReturns` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `user`

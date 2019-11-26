@@ -71,6 +71,7 @@ class PurchaseModel
   {
     $user = $data['user'];
     $products = $data['products'];
+
     try {
       $this->db = $this->db->start();
       $query = null;
@@ -89,7 +90,7 @@ class PurchaseModel
             $data['idProduct'],
             $data['idUser'],
             $data['datePurchase'],
-            $data['datePayment'],
+            is_null($data['datePayment']) || empty($data['datePayment']) ? null : $data['datePayment'],
             $data['state'],
             $data['idPurchase']
           )
@@ -152,15 +153,31 @@ class PurchaseModel
     try {
       $this->db = $this->db->start();
       $query = $this->db->prepare(
-        " SELECT  * 
-            FROM  $this->table 
-           WHERE  idUser = ? 
-             AND  state = 'SIN PAGAR' 
-        ORDER BY  datePurchase desc "
+        " SELECT  prod.name as producto, purc.datePurchase as fechaCompra, prod.price as precio, user.name as usuario
+            FROM  purchase purc
+      INNER JOIN  user on (purc.idUser = user.idUser)
+      INNER JOIN  product prod on (purc.idProduct = prod.idProduct) 
+           WHERE  user.idUser = ? 
+             AND  purc.state = 'SIN PAGAR' 
+        ORDER BY  purc.datePurchase desc, prod.name asc "
       );
       $query->execute(array($data['idUser']));
-      $debts = $query->fetchAll(PDO::FETCH_OBJ);
-      $mail = $this->sender->SendMail($data['mail'], $debts);
+      $result = $query->fetchAll(PDO::FETCH_ASSOC);
+      $debts = "";
+      foreach ($result as $row) {
+        $producto = $row["producto"];
+        $fecha = $row["fechaCompra"];
+        $precio = $row["precio"];
+        $nombre = $row["usuario"];
+
+        $debts .= "<tr align='center'> 
+                    <td width='40%'> $fecha </td>
+                    <td width='40%'> $producto </td>  
+                    <td width='20%' align='left'> &emsp; $$precio </td> 
+                  </tr>";
+      }
+
+      $mail = $this->sender->SendMail($data['mail'], $nombre, $debts);
       $this->response->setResponse(true);
       $this->response->message = $mail;
       //closing connections
