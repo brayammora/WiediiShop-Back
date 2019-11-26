@@ -22,7 +22,7 @@ class mail
         $mail->Host       = 'smtp.gmail.com';                    // Set the SMTP server to send through
         $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
         $mail->Username   = 'bryanmora22@gmail.com';                     // SMTP username
-        $mail->Password   = 'probm1234';                               // SMTP password
+        $mail->Password   = 'secret';                               // SMTP password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;         // Enable TLS encryption; 
         $mail->Port       = 587;                                    // TCP port to connect to
         //Recipients
