@@ -153,7 +153,7 @@ class PurchaseModel
     try {
       $this->db = $this->db->start();
       $query = $this->db->prepare(
-        " SELECT  prod.name as producto, purc.datePurchase as fechaCompra, prod.price as precio, user.name as usuario
+        " SELECT  prod.name as producto, purc.datePurchase as fechaCompra, prod.price as precio, user.name as usuario, user.debt as total
             FROM  purchase purc
       INNER JOIN  user on (purc.idUser = user.idUser)
       INNER JOIN  product prod on (purc.idProduct = prod.idProduct) 
@@ -169,6 +169,7 @@ class PurchaseModel
         $fecha = $row["fechaCompra"];
         $precio = $row["precio"];
         $nombre = $row["usuario"];
+        $total = $row["total"];
 
         $debts .= "<tr align='center'> 
                     <td width='40%'> $fecha </td>
@@ -177,7 +178,9 @@ class PurchaseModel
                   </tr>";
       }
 
-      $mail = $this->sender->SendMail($data['mail'], $nombre, $debts);
+      $subject = 'Reporte de compras';
+      
+      $mail = $this->sender->SendMail($data['mail'], $nombre, $debts, $subject, $total);
       $this->response->setResponse(true);
       $this->response->message = $mail;
       //closing connections

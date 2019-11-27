@@ -17,7 +17,7 @@ class UserModel
     try {
       $this->db = $this->db->start();
       $query = $this->db->prepare(
-        " SELECT  idUser, name, document, mail, fingerprint, rol, password 
+        " SELECT  idUser, name, document, mail, fingerprint, rol, password, debt
            FROM   $this->table "
       );
       $query->execute();
@@ -44,7 +44,7 @@ class UserModel
     try {
       $this->db = $this->db->start();
       $query = $this->db->prepare(
-        " SELECT  idUser, name, document, mail, fingerprint, rol, password 
+        " SELECT  idUser, name, document, mail, fingerprint, rol, password, debt
             FROM  $this->table 
            WHERE  idUser = ? "
       );
@@ -80,7 +80,8 @@ class UserModel
                     mail = ?, 
                     fingerprint = ?,
                     rol = ?,
-                    password = ?
+                    password = ?,
+                    debt = ?
              WHERE  idUser = ? "
         );
         $query->execute(
@@ -91,7 +92,8 @@ class UserModel
             $data['fingerprint'],
             $data['rol'],
             $data['password'],
-            $data['idUser']
+            $data['idUser'],
+            $data['debt']
           )
         );
         $this->response->setResponse(true, "Usuario modificado exitosamente.");
@@ -99,8 +101,8 @@ class UserModel
         $query = $this->db->prepare(
           " INSERT 
               INTO  $this->table 
-                    (name, document, mail, fingerprint, rol, password) 
-            VALUES  (?, ?, ?, ?, ?, ?) "
+                    (name, document, mail, fingerprint, rol, password, debt) 
+            VALUES  (?, ?, ?, ?, ?, ?, ?) "
         );
         $query->execute(
             array(
@@ -109,7 +111,8 @@ class UserModel
               $data['mail'],
               $data['fingerprint'],
               $data['rol'],
-              $data['password']
+              $data['password'],
+              $data['debt']
             )
           );
         $this->response->setResponse(true, "Nuevo usuario creado.");

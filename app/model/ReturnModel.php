@@ -74,7 +74,7 @@ class ReturnModel
     try {
       $this->db = $this->db->start();
       $query = null;
-      if (isset($data['idReturn'])) {
+      if (isset($data['idReturns'])) {
         $query = $this->db->prepare(
           " UPDATE  $this->table 
                SET  idPurchase = ?, 
@@ -122,11 +122,56 @@ class ReturnModel
       $query = $this->db->prepare(
         " DELETE 
             FROM  $this->table 
-           WHERE  idReturn = ? "
+           WHERE  idReturns = ? "
       );
       $query->execute(array($id));
       $this->response->setResponse(true);
       $this->response->message = "Devolución eliminada exitosamente.";
+      //closing connections
+      $query = null;
+      $this->db = null;
+      return $this->response;
+    } catch (Exception $e) {
+      $this->response->setResponse(false, $e->getMessage());
+      return $this->response;
+    }
+  }
+
+  public function SendMail($data)
+  {
+    try {
+      $this->db = $this->db->start();
+      $query = $this->db->prepare(
+        " SELECT  prod.name as producto, purc.datePurchase as fechaCompra, prod.price as precio, user.name as usuario, retu.reason as reason
+            FROM  returns retu
+      INNER JOIN  purchase purc on (retu.idPurchase = purc.idPurchase)
+      INNER JOIN  user on (purc.idUser = user.idUser)
+      INNER JOIN  product prod on (purc.idProduct = prod.idProduct) 
+           WHERE  purc.idPurchase = ? 
+             AND  purc.state = 'DEVUELTO' 
+        ORDER BY  purc.datePurchase desc, prod.name asc "
+      );
+      $query->execute(array($data['idUser']));
+      $result = $query->fetchAll(PDO::FETCH_ASSOC);
+      $debts = "";
+      foreach ($result as $row) {
+        $producto = $row["producto"];
+        $fecha = $row["fechaCompra"];
+        $precio = $row["precio"];
+        $nombre = $row["usuario"];
+        $motivo = $row["reason"];
+
+        $debts .= "<tr align='center'> 
+                    <td width='20%'> $fecha </td>
+                    <td width='20%'> $producto </td>  
+                    <td width='20%' align='left'> &emsp; $$precio </td> 
+                    <td width='40%' align='left'> $motivo </td>
+                  </tr>";
+      }
+
+      $mail = $this->sender->SendMail($data['mail'], $nombre, $debts);
+      $this->response->setResponse(true);
+      $this->response->message = $mail;
       //closing connections
       $query = null;
       $this->db = null;
