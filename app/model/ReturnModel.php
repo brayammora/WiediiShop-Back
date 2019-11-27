@@ -142,12 +142,13 @@ class ReturnModel
     try {
       $this->db = $this->db->start();
       $query = $this->db->prepare(
-        " SELECT  prod.name as producto, purc.datePurchase as fechaCompra, prod.price as precio, user.name as usuario, retu.reason as reason
+        " SELECT  prod.name as producto, purc.datePurchase as fechaCompra, retu.dateReturns as fechaDevolucion,
+                  prod.price as precio, user.name as usuario, user.debt as total, retu.reason as reason
             FROM  returns retu
       INNER JOIN  purchase purc on (retu.idPurchase = purc.idPurchase)
       INNER JOIN  user on (purc.idUser = user.idUser)
       INNER JOIN  product prod on (purc.idProduct = prod.idProduct) 
-           WHERE  purc.idPurchase = ? 
+           WHERE  purc.idUser = ? 
              AND  purc.state = 'DEVUELTO' 
         ORDER BY  purc.datePurchase desc, prod.name asc "
       );
@@ -156,20 +157,25 @@ class ReturnModel
       $debts = "";
       foreach ($result as $row) {
         $producto = $row["producto"];
-        $fecha = $row["fechaCompra"];
+        $fechaCompra = $row["fechaCompra"];
+        $fechaDevolucion = $row["fechaDevolucion"];
         $precio = $row["precio"];
         $nombre = $row["usuario"];
-        $motivo = $row["reason"];
+        $motivo = $row['reason'];
+        $total = $row['total'];
 
         $debts .= "<tr align='center'> 
-                    <td width='20%'> $fecha </td>
+                    <td width='20%'> $fechaCompra </td>
+                    <td width='20%'> $fechaDevolucion </td>
                     <td width='20%'> $producto </td>  
-                    <td width='20%' align='left'> &emsp; $$precio </td> 
-                    <td width='40%' align='left'> $motivo </td>
+                    <td width='20%' align='center'> $$precio </td> 
+                    <td width='20%' align='left'> &nbsp;$motivo </td>
                   </tr>";
       }
 
-      $mail = $this->sender->SendMail($data['mail'], $nombre, $debts);
+      $subject = 'Reporte de devoluciones.';
+
+      $mail = $this->sender->SendMail($data['mail'], $nombre, $debts, $subject, $total, "returns");
       $this->response->setResponse(true);
       $this->response->message = $mail;
       //closing connections

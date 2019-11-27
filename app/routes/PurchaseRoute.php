@@ -97,5 +97,4 @@ $app->group('/purchase/', function () {
         )
       );
   });
-
 });

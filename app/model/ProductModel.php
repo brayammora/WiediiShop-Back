@@ -32,7 +32,6 @@ class ProductModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -60,7 +59,6 @@ class ProductModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -108,7 +106,6 @@ class ProductModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -131,7 +128,6 @@ class ProductModel
       $query = null;
       $this->db = null;
       return $this->response;
-
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;
@@ -163,7 +159,6 @@ class ProductModel
         $this->response->setResponse(false, "Codigo de barras incorrecto.");
       }
       return $this->response;
-      
     } catch (Exception $e) {
       $this->response->setResponse(false, $e->getMessage());
       return $this->response;

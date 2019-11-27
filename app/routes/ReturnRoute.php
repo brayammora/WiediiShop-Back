@@ -3,7 +3,7 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-$app->group('/return/', function () {
+$app->group('/returns/', function () {
 
   $this->get('test', function (Request $request, Response $response) {
     return $response->getBody()
@@ -69,7 +69,7 @@ $app->group('/return/', function () {
   });
 
   $this->post('sendMail', function (Request $request, Response $response) {
-    $obj = new PurchaseModel();
+    $obj = new ReturnModel();
 
     return $response
       ->withHeader('Content-type', 'application/json')
