@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Nov 26, 2019 at 02:59 PM
+-- Generation Time: Nov 29, 2019 at 12:37 PM
 -- Server version: 5.7.26
 -- PHP Version: 7.3.8
 
@@ -58,22 +58,37 @@ CREATE TABLE `purchase` (
 --
 
 INSERT INTO `purchase` (`idPurchase`, `idProduct`, `idUser`, `datePurchase`, `datePayment`, `state`) VALUES
-(58, 1, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(59, 1, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(60, 1, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(61, 2, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(62, 3, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(63, 3, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(64, 4, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(65, 4, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(66, 5, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(67, 5, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(68, 5, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(69, 5, 1, '2019-11-26 07:40:43', NULL, 'SIN PAGAR'),
-(70, 5, 1, '2019-11-26 07:40:43', NULL, 'DEVUELTO'),
-(71, 1, 1, '2019-11-26 09:03:10', NULL, 'SIN PAGAR'),
-(72, 1, 1, '2019-11-26 09:04:24', NULL, 'SIN PAGAR'),
-(73, 1, 1, '2019-11-26 09:06:51', NULL, 'SIN PAGAR');
+(90, 1, 12, '2019-11-26 15:29:00', NULL, 'SIN PAGAR'),
+(91, 1, 12, '2019-11-26 15:30:22', NULL, 'SIN PAGAR'),
+(92, 1, 12, '2019-11-26 16:02:15', NULL, 'SIN PAGAR'),
+(100, 1, 1, '2019-11-27 08:13:34', NULL, 'SIN PAGAR'),
+(101, 1, 1, '2019-11-27 11:18:08', NULL, 'SIN PAGAR'),
+(102, 1, 1, '2019-11-27 11:18:08', NULL, 'SIN PAGAR'),
+(103, 1, 1, '2019-11-27 11:18:08', NULL, 'SIN PAGAR'),
+(104, 2, 1, '2019-11-27 11:18:08', NULL, 'SIN PAGAR'),
+(105, 2, 1, '2019-11-27 11:18:08', NULL, 'SIN PAGAR'),
+(106, 2, 1, '2019-11-27 11:18:08', NULL, 'SIN PAGAR'),
+(107, 2, 1, '2019-11-27 11:18:08', NULL, 'SIN PAGAR'),
+(108, 1, 1, '2019-11-27 11:21:00', NULL, 'SIN PAGAR'),
+(109, 2, 1, '2019-11-27 11:21:00', NULL, 'SIN PAGAR'),
+(110, 1, 1, '2019-11-27 16:26:53', NULL, 'SIN PAGAR');
+
+--
+-- Triggers `purchase`
+--
+DELIMITER $$
+CREATE TRIGGER `actualizarTotal` BEFORE INSERT ON `purchase` FOR EACH ROW UPDATE user as a
+	INNER JOIN 
+	(
+  	  		select b.idUser as idUser, SUM(product.price) as total
+  			 from product
+  	   inner join purchase on (purchase.idProduct = product.idProduct)
+  	   inner join user b on (b.idUser = NEW.idUser and b.idUser = purchase.idUser)
+  	     group by 1
+	) as x ON (a.idUser = x.idUser)
+	SET debt = x.total
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -84,7 +99,7 @@ INSERT INTO `purchase` (`idPurchase`, `idProduct`, `idUser`, `datePurchase`, `da
 CREATE TABLE `returns` (
   `idReturns` int(11) NOT NULL,
   `idPurchase` int(11) NOT NULL,
-  `dateReturns` date NOT NULL,
+  `dateReturns` datetime NOT NULL,
   `reason` varchar(200) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -93,7 +108,13 @@ CREATE TABLE `returns` (
 --
 
 INSERT INTO `returns` (`idReturns`, `idPurchase`, `dateReturns`, `reason`) VALUES
-(39, 70, '2019-11-26', 'survey1');
+(58, 95, '2019-11-27 10:26:27', 'Producto en mal estado o vencido.'),
+(59, 95, '2019-11-27 10:33:23', 'Producto en mal estado o vencido.'),
+(60, 109, '2019-11-27 11:21:46', 'Producto en mal estado o vencido.'),
+(61, 95, '2019-11-27 13:39:40', 'Producto en mal estado o vencido.'),
+(62, 95, '2019-11-27 13:39:51', 'Producto en mal estado o vencido.'),
+(63, 94, '2019-11-27 13:40:00', 'Producto en mal estado o vencido.'),
+(64, 108, '2019-11-27 13:43:36', 'Producto en mal estado o vencido.');
 
 -- --------------------------------------------------------
 
@@ -108,20 +129,21 @@ CREATE TABLE `user` (
   `mail` varchar(200) NOT NULL,
   `fingerprint` varchar(200) DEFAULT NULL,
   `rol` varchar(200) DEFAULT NULL,
-  `password` varchar(200) DEFAULT NULL
+  `password` varchar(200) DEFAULT NULL,
+  `debt` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`idUser`, `name`, `document`, `mail`, `fingerprint`, `rol`, `password`) VALUES
-(1, 'Brayam Mora', '111111', 'brayam.mora@wiedii.co', '1111', NULL, NULL),
-(3, 'Nicola Di Candia', '333333', 'nicola.dicandia@wiedii.co', '3333', NULL, NULL),
-(5, 'Yorluis Vega', '555555', 'yorluis.vega@wiedii.co', '5555', NULL, NULL),
-(7, 'Andres Carrillo', '666666', 'andres.carrillo@wiedii.co', '6666', NULL, NULL),
-(8, 'Renzon Caceres', '777777', 'renzon.caceres@wiedii.co', '7777', NULL, NULL),
-(12, 'Juan Mora', '222222', 'juan.mora@correo.com', '2222', 'admin', '1234');
+INSERT INTO `user` (`idUser`, `name`, `document`, `mail`, `fingerprint`, `rol`, `password`, `debt`) VALUES
+(1, 'Brayam Mora', '111111', 'brayam.mora@wiedii.co', '1111', NULL, NULL, 9000),
+(3, 'Nicola Di Candia', '333333', 'nicola.dicandia@wiedii.co', '3333', NULL, NULL, NULL),
+(5, 'Yorluis Vega', '555555', 'yorluis.vega@wiedii.co', '5555', NULL, NULL, NULL),
+(7, 'Andres Carrillo', '666666', 'andres.carrillo@wiedii.co', '6666', NULL, NULL, NULL),
+(8, 'Renzon Caceres', '777777', 'renzon.caceres@wiedii.co', '7777', NULL, NULL, NULL),
+(12, 'Juan Mora', '222222', 'juan.mora@correo.com', '2222', 'admin', '1234', 9000);
 
 --
 -- Indexes for dumped tables
@@ -170,13 +192,13 @@ ALTER TABLE `product`
 -- AUTO_INCREMENT for table `purchase`
 --
 ALTER TABLE `purchase`
-  MODIFY `idPurchase` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `idPurchase` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- AUTO_INCREMENT for table `returns`
 --
 ALTER TABLE `returns`
-  MODIFY `idReturns` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `idReturns` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `user`
